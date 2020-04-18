@@ -8,4 +8,6 @@
 
 / HomeR GET POST
 
+/testHome TestHomeR GET POST
+
 /comments CommentR POST

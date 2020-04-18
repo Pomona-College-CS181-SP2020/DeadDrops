@@ -47,6 +47,33 @@ postHomeR = do
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
+
+postTestHomeR :: Handler Html
+postTestHomeR = do
+    ((result, formWidget), formEnctype) <- runFormPost sampleForm
+    let handlerName = "postTestHomeR" :: Text
+        submission = case result of
+            FormSuccess res -> Just res
+            _ -> Nothing
+
+    defaultLayout $ do
+        let (commentFormId, commentTextareaId, commentListId) = commentIds
+        aDomId <- newIdent
+        setTitle "Welcome To Yesod Testing!"
+        $(widgetFile "homepage")
+
+
+getTestHomeR :: Handler Html
+getTestHomeR = do
+    (formWidget, formEnctype) <- generateFormPost sampleForm
+    let submission = Nothing :: Maybe FileForm
+        handlerName = "getTestHomeR" :: Text
+    defaultLayout $ do
+        let (commentFormId, commentTextareaId, commentListId) = commentIds
+        aDomId <- newIdent
+        setTitle "Welcome To Yesod testing!"
+        $(widgetFile "homepage")
+
 sampleForm :: Form FileForm
 sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
     <$> fileAFormReq "Choose a file"

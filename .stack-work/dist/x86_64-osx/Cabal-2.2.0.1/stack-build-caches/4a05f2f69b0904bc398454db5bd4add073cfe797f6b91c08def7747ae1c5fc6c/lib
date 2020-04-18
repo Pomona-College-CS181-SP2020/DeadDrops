@@ -1,0 +1,80 @@
+/Users/danielrosen/Downloads/CS181N/DeadDrops/templates/default-layout.hamlet:
+  hash: 7fbfe84a3093d9324da6577527b1777da38f5777d6722990fb34db6107cdaf65
+  size: 1585
+  modtime: 1587079277
+/Users/danielrosen/Downloads/CS181N/DeadDrops/config/routes:
+  hash: a8756ef659107e68c2d9d02d10cbd9427071221084bf5c55661edf70ac16e05d
+  size: 309
+  modtime: 1587224435
+/Users/danielrosen/Downloads/CS181N/DeadDrops/config/robots.txt:
+  hash: fd89345af6aca5dab85f2aa6a830e270a362b1fa6b5f19607ddd773a081ed651
+  size: 14
+  modtime: 1587079276
+/Users/danielrosen/Downloads/CS181N/DeadDrops/config/favicon.ico:
+  hash: 26f64af57709ca371fe68e50a5d915661e4aa017748983906d57d00f7fc3f748
+  size: 1342
+  modtime: 1587079276
+/Users/danielrosen/.stack/programs/x86_64-osx/ghc-8.4.4/lib/ghc-8.4.4/include/ghcversion.h:
+  hash: 3b9bbcae80e989c985b8bf9030bc523bff6a4ec3bd90838a2350f407251ced3f
+  size: 524
+  modtime: 1586275429
+/Users/danielrosen/Downloads/CS181N/DeadDrops/src/Foundation.hs:
+  hash: 5009b3c22f3cfb3634f8dc1dbb1b8014ce928ba256c2e124368c0c5f3f2f7f46
+  size: 8534
+  modtime: 1587079276
+/Users/danielrosen/Downloads/CS181N/DeadDrops/src/Import/NoFoundation.hs:
+  hash: f5639f8f96a89b3fef7a703f5a87a9de4c6a63c965c346dc15630f48fc6307e2
+  size: 288
+  modtime: 1587079277
+/Users/danielrosen/Downloads/CS181N/DeadDrops/src/Import.hs:
+  hash: e2316f6d638cc4e9d157c71f1b1b075efb0b67fdc59fee700ac8d9a7df167a03
+  size: 125
+  modtime: 1587079277
+/Users/danielrosen/Downloads/CS181N/DeadDrops/package.yaml:
+  hash: 59837a994d2fc1cc51df6d684f080f27ee49bb987d8c534c43437a58bb1eaa91
+  size: 2100
+  modtime: 1587079276
+/Users/danielrosen/Downloads/CS181N/DeadDrops/src/Handler/Common.hs:
+  hash: e71035acb286cb06fee6a8629b078cae31385b98251f88e871d27d196a5fdb02
+  size: 777
+  modtime: 1587079276
+/Users/danielrosen/Downloads/CS181N/DeadDrops/templates/homepage.hamlet:
+  hash: 6f9a5e24040d27abb3f44baea942f73ec1ffef7337423e1d34f847234f265fca
+  size: 5514
+  modtime: 1587079277
+/Users/danielrosen/Downloads/CS181N/DeadDrops/src/Settings/StaticFiles.hs:
+  hash: 05d50ff4565a9c18c44102b7a541ecbfe7d71087bc99d14757edf5fe098816a0
+  size: 799
+  modtime: 1587079277
+/Users/danielrosen/Downloads/CS181N/DeadDrops/src/Handler/Comment.hs:
+  hash: 99580b20b3ab3bb797aed94b98cc0e8c00909d7d2519612537c4298e4192afd5
+  size: 192
+  modtime: 1587079276
+/Users/danielrosen/Downloads/CS181N/DeadDrops/templates/default-layout-wrapper.hamlet:
+  hash: 3eb1339646bbebe23b958b9b8ddbf68c7979576fc13008f023b23e32ebfef8be
+  size: 2674
+  modtime: 1587079277
+/Users/danielrosen/Downloads/CS181N/DeadDrops/config/settings.yml:
+  hash: dc4c3247c2f686855af88141b4ca1476290a98fe4614661942a293c0c6973118
+  size: 1211
+  modtime: 1587079276
+/Users/danielrosen/Downloads/CS181N/DeadDrops/.stack-work/dist/x86_64-osx/Cabal-2.2.0.1/build/autogen/cabal_macros.h:
+  hash: 61853ba7367f86ae0e77d6016d0b0803bd4869b62dd87ccca81103f06f62b4d6
+  size: 16937
+  modtime: 1587222996
+/Users/danielrosen/Downloads/CS181N/DeadDrops/src/Handler/Home.hs:
+  hash: fd7c453328d6b0ad5a0b1525a8d521a762b7feda2f1246cee9cf468fb426dcc8
+  size: 3197
+  modtime: 1587224398
+/Users/danielrosen/Downloads/CS181N/DeadDrops/src/Settings.hs:
+  hash: 7d1d24b5c19aaed1aefc8843836b2642c41dd02c6a4de9f1b88fa624cef64e1c
+  size: 5478
+  modtime: 1587079277
+/Users/danielrosen/Downloads/CS181N/DeadDrops/DeadDrops.cabal:
+  hash: e8c08a9fa0c52bc43494a586c9194ecd922828ee4a23b0e373e66af02954ec33
+  size: 4471
+  modtime: 1587079638
+/Users/danielrosen/Downloads/CS181N/DeadDrops/src/Application.hs:
+  hash: 0be37714071592f3f10941cad01b3f6194249488852b242d7278c03d30d93e09
+  size: 5906
+  modtime: 1587079276
