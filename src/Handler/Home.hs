@@ -7,7 +7,9 @@ module Handler.Home where
 
 import Import
 import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3)
+import Yesod.Form.Jquery
 import Text.Julius (RawJS (..))
+import Import.RandomStrings
 
 -- Define our data that will be used for creating the form.
 data FileForm = FileForm
@@ -40,6 +42,7 @@ postHomeR = do
         submission = case result of
             FormSuccess res -> Just res
             _ -> Nothing
+        word = randomWord randomChar 64
 
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
@@ -47,36 +50,13 @@ postHomeR = do
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
-
-postTestHomeR :: Handler Html
-postTestHomeR = do
-    ((result, formWidget), formEnctype) <- runFormPost sampleForm
-    let handlerName = "postTestHomeR" :: Text
-        submission = case result of
-            FormSuccess res -> Just res
-            _ -> Nothing
-
-    defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod Testing!"
-        $(widgetFile "homepage")
-
-
-getTestHomeR :: Handler Html
-getTestHomeR = do
-    (formWidget, formEnctype) <- generateFormPost sampleForm
-    let submission = Nothing :: Maybe FileForm
-        handlerName = "getTestHomeR" :: Text
-    defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod testing!"
-        $(widgetFile "homepage")
-
 sampleForm :: Form FileForm
 sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
-    <$> fileAFormReq "Choose a file"
+    <$> fileAFormReq "Upload a file"
+    -- <*> areq (jqueryDayField def
+      --  { jdsChangeYear = True -- give a year dropdown
+        --, jdsYearRange = "2020:+20" -- 1900 till five years ago
+        --}) "Download By" Nothing
     <*> areq textField textSettings Nothing
     -- Add attributes like the placeholder and CSS classes.
     where textSettings = FieldSettings
