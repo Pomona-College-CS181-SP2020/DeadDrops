@@ -28,6 +28,8 @@ import Yesod.Default.Util          (WidgetFileSettings, widgetFileNoReload,
 data AppSettings = AppSettings
     { appStaticDir              :: String
     -- ^ Directory from which to serve static files.
+    , appFileUploadDirectory    :: Text
+    -- ^ Directory where uploaded files will be stored 
     , appRoot                   :: Maybe Text
     -- ^ Base for all generated URLs. If @Nothing@, determined
     -- from the request headers.
@@ -66,6 +68,7 @@ instance FromJSON AppSettings where
                 False
 #endif
         appStaticDir              <- o .: "static-dir"
+        appFileUploadDirectory    <- o .: "fileUploadDirectory"
         appRoot                   <- o .:? "approot"
         appHost                   <- fromString <$> o .: "host"
         appPort                   <- o .: "port"

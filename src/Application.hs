@@ -34,7 +34,7 @@ import Network.Wai.Middleware.RequestLogger (Destination (Logger),
                                              mkRequestLogger, outputFormat)
 import System.Log.FastLogger                (defaultBufSize, newStdoutLoggerSet,
                                              toLogStr)
-
+import System.Directory (createDirectoryIfMissing)
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
 import Handler.Common
@@ -59,7 +59,10 @@ makeFoundation appSettings = do
     appStatic <-
         (if appMutableStatic appSettings then staticDevel else static)
         (appStaticDir appSettings)
+    --ensure file upload directory is created
+    createDirectoryIfMissing True (unpack $ appFileUploadDirectory appSettings)
 
+    appUploadStatic <- static (unpack (appFileUploadDirectory appSettings))
     -- Return the foundation
     return App {..}
 
