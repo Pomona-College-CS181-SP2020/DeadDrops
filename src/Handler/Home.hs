@@ -50,6 +50,33 @@ postHomeR = do
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
+
+getDownloadR :: Handler Html
+getDownloadR = do
+    (formWidget, formEnctype) <- generateFormPost sampleForm
+    let submission = Nothing :: Maybe FileForm
+        handlerName = "getHomeR" :: Text
+    defaultLayout $ do
+        let (commentFormId, commentTextareaId, commentListId) = commentIds
+        aDomId <- newIdent
+        setTitle "Welcome To Yesod!"
+        $(widgetFile "downloadpage")
+
+postDownloadR :: Handler Html
+postDownloadR = do
+    ((result, formWidget), formEnctype) <- runFormPost sampleForm
+    let handlerName = "postHomeR" :: Text
+        submission = case result of
+            FormSuccess res -> Just res
+            _ -> Nothing
+        word = randomWord randomChar 64
+
+    defaultLayout $ do
+        let (commentFormId, commentTextareaId, commentListId) = commentIds
+        aDomId <- newIdent
+        setTitle "Welcome To Yesod!"
+        $(widgetFile "downloadpage")
+
 sampleForm :: Form FileForm
 sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
     <$> fileAFormReq "Upload a file"
