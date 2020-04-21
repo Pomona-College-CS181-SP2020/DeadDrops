@@ -17,7 +17,7 @@ spec = withApp $ do
               setMethod "POST"
               setUrl HomeR
               addToken
-              fileByLabelExact "Choose a file" "test/Spec.hs" "text/plain" -- talk about self-reference
+              fileByLabelContain "a file" "test/Spec.hs" "text/plain" -- talk about self-reference
               byLabelExact "What's on the file?" "Some Content"
 
           -- more debugging printBody
