@@ -79,8 +79,8 @@
                 <div .bs-callout.bs-callout-info.upload-response>
 
                     $maybe (FileForm info con) <- submission
-                        Your file type is <em>#{fileContentType info}</em>. Your nonce is: #{Data.Text.Encoding.decodeUtf8 $ encode nonce}
-                        
+                        Your file type is <em>#{fileContentType info}</em>. Your file is available at: #{Data.Text.Encoding.decodeUtf8 $ encode nonce}
+
 
                     $nothing
                         Your URL will be here...

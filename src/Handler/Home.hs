@@ -17,9 +17,11 @@ import Control.Monad.CryptoRandom
 import Control.Monad.Error
 import Crypto.Random (SystemRandom, newGenIO)
 import Data.ByteString.Base16 (encode)
+import Data.Text                                           (unpack)
 import Data.Text.Encoding (decodeUtf8)
 import Data.Text.Encoding         (decodeUtf8)
 import UnliftIO.Exception         (catch)
+import System.Directory (createDirectoryIfMissing)
 
 -- Define our data that will be used for creating the form.
 data FileForm = FileForm
@@ -84,6 +86,9 @@ postHomeR = do
             FormSuccess res -> Just res
             _ -> Nothing
     randomBS <- getBytes 16
+    case submission of
+          Just fileInfo1 -> do
+            saveMeas (fileInfo fileInfo1) ( "/tmp/yesod-upload/" ++ ( Data.Text.unpack (Data.Text.Encoding.decodeUtf8 $ encode randomBS)) ++ "/temp")
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
             nonce = randomBS
@@ -91,6 +96,13 @@ postHomeR = do
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
+saveMeas :: FileInfo -> FilePath -> HandlerT App IO (FilePath)
+saveMeas file dest = do
+    let filename = Import.unpack $ fileName file
+        dest' = dest </> filename
+    liftIO $ createDirectoryIfMissing True dest
+    liftIO $ fileMove file dest'
+    return filename
 
 getDownloadR :: Handler Html
 getDownloadR = do

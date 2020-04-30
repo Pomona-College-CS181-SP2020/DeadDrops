@@ -14,6 +14,7 @@ dependencies:
 - monad-control
 - monadcryptorandom
 - mtl
+- text
 - exceptions
 - unliftio
 - yesod-core >=1.6 && <1.7
