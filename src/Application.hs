@@ -40,6 +40,7 @@ import System.Directory (createDirectoryIfMissing)
 import Handler.Common
 import Handler.Home
 import Handler.Comment
+import Crypto.Random (SystemRandom, newGenIO)
 
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the
@@ -63,6 +64,12 @@ makeFoundation appSettings = do
     createDirectoryIfMissing True (unpack $ appFileUploadDirectory appSettings)
 
     appUploadStatic <- static (unpack (appFileUploadDirectory appSettings))
+
+    --make random number generater
+
+    gen <- newGenIO
+    randGen <- newIORef gen
+
     -- Return the foundation
     return App {..}
 

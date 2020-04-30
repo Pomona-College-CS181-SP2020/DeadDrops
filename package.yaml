@@ -9,6 +9,13 @@ dependencies:
 
 - yesod >=1.6 && <1.7
 - random
+- base16-bytestring
+- crypto-api
+- monad-control
+- monadcryptorandom
+- mtl
+- exceptions
+- unliftio
 - yesod-core >=1.6 && <1.7
 - yesod-static >=1.6 && <1.7
 - yesod-form >=1.6 && <1.7

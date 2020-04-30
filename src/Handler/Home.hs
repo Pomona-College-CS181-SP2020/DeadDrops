@@ -3,13 +3,23 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module Handler.Home where
 
 import Import
 import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3)
 import Yesod.Form.Jquery
 import Text.Julius (RawJS (..))
-import Import.RandomStrings
+import Control.Monad              (join)
+import Control.Monad.Catch        (throwM)
+import Control.Monad.CryptoRandom
+import Control.Monad.Error
+import Crypto.Random (SystemRandom, newGenIO)
+import Data.ByteString.Base16 (encode)
+import Data.Text.Encoding (decodeUtf8)
+import Data.Text.Encoding         (decodeUtf8)
+import UnliftIO.Exception         (catch)
 
 -- Define our data that will be used for creating the form.
 data FileForm = FileForm
@@ -35,6 +45,36 @@ getHomeR = do
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
+
+instance MonadError GenError Handler where
+            throwError = throwM
+            catchError = catch
+instance MonadCRandom GenError Handler where
+            getCRandom = wrap crandom
+            {-# INLINE getCRandom #-}
+            getBytes i = wrap (genBytes i)
+            {-# INLINE getBytes #-}
+            getBytesWithEntropy i e = wrap (genBytesWithEntropy i e)
+            {-# INLINE getBytesWithEntropy #-}
+            doReseed bs = do
+                genRef <- fmap randGen getYesod
+                join $ liftIO $ atomicModifyIORef genRef $ \gen ->
+                    case reseed bs gen of
+                        Left e -> (gen, throwM e)
+                        Right gen' -> (gen', return ())
+            {-# INLINE doReseed #-}
+
+wrap :: (SystemRandom -> Either GenError (a, SystemRandom)) -> Handler a
+wrap f = do
+      genRef <- fmap randGen getYesod
+      join $ liftIO $ atomicModifyIORef genRef $ \gen ->
+          case f gen of
+                Left e -> (gen, throwM e)
+                Right (x, gen') -> (gen', return x)
+
+uploadDirectory :: FilePath
+uploadDirectory = "temp"
+
 postHomeR :: Handler Html
 postHomeR = do
     ((result, formWidget), formEnctype) <- runFormPost sampleForm
@@ -42,13 +82,15 @@ postHomeR = do
         submission = case result of
             FormSuccess res -> Just res
             _ -> Nothing
-        word = randomWord randomChar 64
-
+    randomBS <- getBytes 16
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
         aDomId <- newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
+
+
+
 
 sampleForm :: Form FileForm
 sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
