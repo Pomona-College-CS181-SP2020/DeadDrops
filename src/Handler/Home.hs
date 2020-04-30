@@ -80,6 +80,7 @@ uploadDirectory = "temp"
 
 postHomeR :: Handler Html
 postHomeR = do
+    master <- getYesod
     ((result, formWidget), formEnctype) <- runFormPost sampleForm
     let handlerName = "postHomeR" :: Text
         submission = case result of
@@ -88,7 +89,7 @@ postHomeR = do
     randomBS <- getBytes 16
     case submission of
           Just fileInfo1 -> do
-            saveMeas (fileInfo fileInfo1) ( "/tmp/yesod-upload/" ++ ( Data.Text.unpack (Data.Text.Encoding.decodeUtf8 $ encode randomBS)) ++ "/temp")
+            saveMeas (fileInfo fileInfo1) ( (Data.Text.unpack  $ (appFileUploadDirectory $ appSettings master) ++ "/" ++ (Data.Text.Encoding.decodeUtf8 $ encode randomBS)) ++ "/data")
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
             nonce = randomBS
