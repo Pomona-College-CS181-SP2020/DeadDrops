@@ -72,7 +72,7 @@
                         ^{formWidget}
 
                         <button .btn.btn-primary type="submit">
-                            Upload it!
+                            Choose a file.
 
 
             <div .col-lg-4.col-lg-offset-1>

@@ -8,6 +8,9 @@
 
 / HomeR GET POST
 
+/download DownloadR GET POST
+
+
 /files StaticUploadFilesR Static appUploadStatic
 
 /comments CommentR POST
