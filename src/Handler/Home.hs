@@ -39,6 +39,7 @@ getHomeR = do
     (formWidget, formEnctype) <- generateFormPost sampleForm
     let submission = Nothing :: Maybe FileForm
         handlerName = "getHomeR" :: Text
+        nonce = undefined
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
         aDomId <- newIdent
@@ -85,6 +86,7 @@ postHomeR = do
     randomBS <- getBytes 16
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
+            nonce = randomBS
         aDomId <- newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
