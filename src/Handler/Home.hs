@@ -22,12 +22,16 @@ import Data.Text.Encoding (decodeUtf8)
 import Data.Text.Encoding         (decodeUtf8)
 import UnliftIO.Exception         (catch)
 import System.Directory (createDirectoryIfMissing)
+import Data.Time
+import Data.ByteString.Lazy.UTF8 as BLU
 
 -- Define our data that will be used for creating the form.
 data FileForm = FileForm
     { fileInfo :: FileInfo
     , downloadFrom :: Day
+    , downloadFromTime :: TimeOfDay
     , downloadTo :: Day
+    , downloadEndTime :: TimeOfDay
     , fileDescription :: Text
     }
 
@@ -84,14 +88,17 @@ postHomeR :: Handler Html
 postHomeR = do
     master <- getYesod
     ((result, formWidget), formEnctype) <- runFormPost sampleForm
+
     let handlerName = "postHomeR" :: Text
         submission = case result of
             FormSuccess res -> Just res
             _ -> Nothing
     randomBS <- getBytes 16
     case submission of
-          Just fileInfo1 -> do
-            saveMeas (fileInfo fileInfo1) ( (Data.Text.unpack  $ (appFileUploadDirectory $ appSettings master) ++ "/" ++ (Data.Text.Encoding.decodeUtf8 $ encode randomBS)) ++ "/data")
+          Just fileForm -> do
+            let prefix = (Data.Text.unpack $ (appFileUploadDirectory $ appSettings master) ++ "/" ++ (Data.Text.Encoding.decodeUtf8 $ encode randomBS))
+            saveMeas (fileInfo fileForm)  (prefix ++ "/data")
+            makeMetadataFile fileForm prefix
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
             nonce = randomBS
@@ -106,6 +113,28 @@ saveMeas file dest = do
     liftIO $ createDirectoryIfMissing True dest
     liftIO $ fileMove file dest'
     return filename
+
+makeMetadataFile :: FileForm -> FilePath -> HandlerT App IO (FilePath)
+makeMetadataFile fileForm filePath = do
+    let startTime = downloadFromTime fileForm
+        endTime = downloadEndTime fileForm
+        startDate = downloadFrom fileForm
+        endDate = downloadTo fileForm
+        filename = Import.unpack $ fileName (fileInfo fileForm)
+        dest' = filePath </> "meta.meta"
+        utctimeStart = todToUTCTime startTime startDate
+        utctimeEnd = todToUTCTime endTime endDate
+        fileStartDate = (show utctimeStart) ++ "\n"
+        fileEndDate = (show utctimeEnd) ++ "\n"
+    currTime <- liftIO getCurrentTimeZone
+    -- utcStart <- localToUTCTimeOfDay (currTime) startTime
+    -- utcEnd <- localToUTCTimeOfDay currTime endTime
+    liftIO $ writeFile dest' ((Import.fromString filename ++ "\n") ++ (Import.fromString fileStartDate) ++ (Import.fromString fileEndDate))
+    return filename
+
+todToUTCTime :: TimeOfDay -> Day -> UTCTime
+todToUTCTime tod day = UTCTime day (timeOfDayToTime tod)
+
 
 getDownloadR :: Handler Html
 getDownloadR = do
@@ -135,14 +164,20 @@ postDownloadR = do
 sampleForm :: Form FileForm
 sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
     <$> fileAFormReq "Upload a file"
+    -- <*> areq (jqueryDayField def
+    --    { jdsChangeYear = True -- give a year dropdown
+    --    , jdsYearRange = "2020:+20" -- 2020 till 20 years from now
+    --     }) "Download Window Start Date " Nothing
     <*> areq (jqueryDayField def
        { jdsChangeYear = True -- give a year dropdown
-       , jdsYearRange = "2020:+20" -- 2020 till 20 years from now
-        }) "Download Window Start Date " Nothing
+        , jdsYearRange = "2020:+20" -- 2020 till 20 years from now
+       }) "Download Window Start Date " Nothing
+    <*> areq timeFieldTypeTime startTimeSettings Nothing
     <*> areq (jqueryDayField def
        { jdsChangeYear = True -- give a year dropdown
         , jdsYearRange = "2020:+20" -- 2020 till 20 years from now
        }) "Download Window End Date " Nothing
+    <*> areq timeFieldTypeTime endTimeSettings Nothing
     <*> areq textField textSettings Nothing
     -- Add attributes like the placeholder and CSS classes.
     where textSettings = FieldSettings
@@ -153,6 +188,26 @@ sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
             , fsAttrs =
                 [ ("class", "form-control")
                 , ("placeholder", "File description")
+                ]
+            }
+          startTimeSettings = FieldSettings
+            { fsLabel = "Start time"
+              , fsTooltip = Nothing
+              , fsId = Nothing
+              , fsName = Nothing
+              , fsAttrs =
+                [ ("class", "form-control")
+                , ("current time", "This is a test!")
+                ]
+            }
+          endTimeSettings = FieldSettings
+            { fsLabel = "End time"
+              , fsTooltip = Nothing
+              , fsId = Nothing
+              , fsName = Nothing
+              , fsAttrs =
+                [ ("class", "form-control")
+                , ("current time", "This is a test!")
                 ]
             }
 

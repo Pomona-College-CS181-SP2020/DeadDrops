@@ -14,6 +14,7 @@ dependencies:
 - monad-control
 - monadcryptorandom
 - mtl
+- utf8-string
 - text
 - exceptions
 - unliftio
