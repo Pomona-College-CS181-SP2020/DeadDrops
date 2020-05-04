@@ -26,6 +26,8 @@ import System.Directory (createDirectoryIfMissing)
 -- Define our data that will be used for creating the form.
 data FileForm = FileForm
     { fileInfo :: FileInfo
+    , downloadFrom :: Day
+    , downloadTo :: Day
     , fileDescription :: Text
     }
 
@@ -133,10 +135,14 @@ postDownloadR = do
 sampleForm :: Form FileForm
 sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
     <$> fileAFormReq "Upload a file"
-    -- <*> areq (jqueryDayField def
-      --  { jdsChangeYear = True -- give a year dropdown
-        --, jdsYearRange = "2020:+20" -- 1900 till five years ago
-        --}) "Download By" Nothing
+    <*> areq (jqueryDayField def
+       { jdsChangeYear = True -- give a year dropdown
+       , jdsYearRange = "2020:+20" -- 2020 till 20 years from now
+        }) "Download Window Start Date " Nothing
+    <*> areq (jqueryDayField def
+       { jdsChangeYear = True -- give a year dropdown
+        , jdsYearRange = "2020:+20" -- 2020 till 20 years from now
+       }) "Download Window End Date " Nothing
     <*> areq textField textSettings Nothing
     -- Add attributes like the placeholder and CSS classes.
     where textSettings = FieldSettings

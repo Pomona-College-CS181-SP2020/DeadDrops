@@ -1,7 +1,7 @@
 
 
 <div .container>
-    
+
     <!-- Download
         ================================================== -->
     <div .bs-docs-section>
@@ -28,7 +28,7 @@
             <div .col-lg-4.col-lg-offset-1>
                 <div .bs-callout.bs-callout-info.upload-response>
 
-                    $maybe (FileForm info con) <- submission
+                    $maybe (FileForm info fromDate toDate con) <- submission
                         Your file type is <em>#{fileContentType info}</em>. You say it has: <em>#{con}</em>
 
                     $nothing
