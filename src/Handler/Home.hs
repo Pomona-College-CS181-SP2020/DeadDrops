@@ -192,26 +192,31 @@ getDownloadR nonce = do
     master <- getYesod
     directoryExists <- liftIO $ doesDirectoryExist ((Data.Text.unpack $ (appFileUploadDirectory $ appSettings master)) ++ "/" ++ nonce)
     if directoryExists
-        then
-           do
-                fileContents <- liftIO $ readFile ("/var/yesod-upload/" ++ nonce ++ "/meta.meta")
-                let arr = (Import.lines (bsToStr fileContents))
-                    fileName =  (arr!!0)
-
-                let submission = Nothing :: Maybe FileForm
-                    handlerName = "getHomeR" :: Text
-                    downloadUrl = "/files/" ++ nonce ++"/data/" ++ fileName :: String
-                defaultLayout $ do
-                    setTitle "Welcome To Yesod!"
-                    $(widgetFile "downloadpage")
-
-    else
-        do
-                defaultLayout $ do
-                    let (commentFormId, commentTextareaId, commentListId) = commentIds
-                    aDomId <- newIdent
-                    setTitle "Welcome To Yesod!"
-                    $(widgetFile "errorpage")
+        then do
+            fileContents <- liftIO $ readFile ("/var/yesod-upload/" ++ nonce ++ "/meta.meta")
+            let arr = (Import.lines (bsToStr fileContents))
+                fileName =  (arr!!0)
+                startTime = understandTime (arr!!2) :: UTCTime
+                endTime = understandTime (arr!!3) :: UTCTime
+            currTime <- liftIO getCurrentTime
+            if (currTime <= endTime) && (currTime >= startTime)
+                then do
+                    let submission = Nothing :: Maybe FileForm
+                        handlerName = "getHomeR" :: Text
+                        downloadUrl = "/files/" ++ nonce ++"/data/" ++ fileName :: String
+                    defaultLayout $ do
+                        setTitle "Welcome To Yesod!"
+                        $(widgetFile "downloadpage")
+                else do
+                    defaultLayout $ do
+                        setTitle "Welcome To Yesod!"
+                        $(widgetFile "errorpage")
+        else do
+            defaultLayout $ do
+                let (commentFormId, commentTextareaId, commentListId) = commentIds
+                aDomId <- newIdent
+                setTitle "Welcome To Yesod!"
+                $(widgetFile "errorpage")
 
 
 
