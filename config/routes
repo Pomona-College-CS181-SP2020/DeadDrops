@@ -8,9 +8,9 @@
 
 / HomeR GET POST
 
-/download/#String DownloadR GET 
+/download/#String DownloadR GET
 
 
-/files StaticUploadFilesR Static appUploadStatic
+/files/#String/data/#String RetrieveR GET
 
 /comments CommentR POST

@@ -131,7 +131,7 @@ instance Yesod App where
     -- Routes not requiring authenitcation.
     isAuthorized FaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
-    isAuthorized (StaticUploadFilesR _) _ = return Authorized
+    --isAuthorized (StaticUploadFilesR _) _ = return Authorized
     -- Default to Authorized for now.
     isAuthorized _ _ = return Authorized
 

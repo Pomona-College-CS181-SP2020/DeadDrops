@@ -56,6 +56,10 @@ getHomeR = do
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
+getRetrieveR :: String -> String -> Handler ()
+getRetrieveR nonce filename = do
+  master <- getYesod
+  sendFile "text/html" ((Data.Text.unpack (appFileUploadDirectory $ appSettings master)) ++ "/" ++ nonce ++ "/data/"++ filename)
 
 instance MonadError GenError Handler where
             throwError = throwM
