@@ -2,8 +2,8 @@
     <div .container>
         <div .row>
             <h1 .header>
-                 
+                 Ready to Roll!
             <h2>
-                Fast, stable & spiced with great community
-            <a href="localhost:3000/" .btn.btn-info.btn-lg>
-                Read the Book
+                Your file will be available from __ to __ UTC Time
+            <a href=#{downloadUrl} .btn.btn-info.btn-lg>
+                Download!

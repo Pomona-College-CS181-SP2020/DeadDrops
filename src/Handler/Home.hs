@@ -21,9 +21,11 @@ import Data.Text                                           (unpack)
 import Data.Text.Encoding (decodeUtf8)
 import Data.Text.Encoding         (decodeUtf8)
 import UnliftIO.Exception         (catch)
-import System.Directory (createDirectoryIfMissing, doesDirectoryExist) 
+import System.Directory (createDirectoryIfMissing, doesDirectoryExist)
 import Data.Time
-import Data.ByteString.Lazy.UTF8 as BLU
+import Data.ByteString.Lazy.UTF8 as BLU (toString)
+import Data.List ((!!))
+import Data.Char (chr)
 
 -- Define our data that will be used for creating the form.
 data FileForm = FileForm
@@ -132,24 +134,28 @@ makeMetadataFile fileForm filePath = do
 todToUTCTime :: TimeOfDay -> Day -> UTCTime
 todToUTCTime tod day = UTCTime day (timeOfDayToTime tod)
 
+bsToStr :: ByteString -> String
+bsToStr = map (chr . fromEnum) . Import.unpack
 
 getDownloadR :: String -> Handler Html
 getDownloadR nonce = do
     master <- getYesod
     directoryExists <- liftIO $ doesDirectoryExist ((Data.Text.unpack $ (appFileUploadDirectory $ appSettings master)) ++ "/" ++ nonce)
-    if directoryExists 
-        then 
-           do 
-                (formWidget, formEnctype) <- generateFormPost sampleForm
+    if directoryExists
+        then
+           do
+                fileContents <- liftIO $ readFile ("/var/yesod-upload/" ++ nonce ++ "/meta.meta")
+                let arr = (Import.lines (bsToStr fileContents))
+                    fileName =  (arr!!0)
+
                 let submission = Nothing :: Maybe FileForm
                     handlerName = "getHomeR" :: Text
+                    downloadUrl = "/files/" ++ nonce ++"/data/" ++ fileName :: String
                 defaultLayout $ do
-                    let (commentFormId, commentTextareaId, commentListId) = commentIds
-                    aDomId <- newIdent
                     setTitle "Welcome To Yesod!"
                     $(widgetFile "downloadpage")
-     
-    else 
+
+    else
         do
                 defaultLayout $ do
                     let (commentFormId, commentTextareaId, commentListId) = commentIds
@@ -158,7 +164,7 @@ getDownloadR nonce = do
                     $(widgetFile "errorpage")
 
 
-    
+
 
     -- (formWidget, formEnctype) <- generateFormPost sampleForm
     -- let submission = Nothing :: Maybe FileForm
