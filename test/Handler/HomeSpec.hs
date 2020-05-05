@@ -21,5 +21,5 @@ spec = withApp $ do
               byLabelExact "Upload a file" "localhost"
 
           -- more debugging printBody
-          htmlAllContain ".upload-response" "text/plain"
-          htmlAllContain ".upload-response" "Some Content"
+          htmlAllContain "upload-response" "text/plain"
+          htmlAllContain "upload-response" "available"
