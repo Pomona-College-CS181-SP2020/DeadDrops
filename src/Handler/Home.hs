@@ -21,7 +21,7 @@ import Data.Text                                           (unpack)
 import Data.Text.Encoding (decodeUtf8)
 import Data.Text.Encoding         (decodeUtf8)
 import UnliftIO.Exception         (catch)
-import System.Directory (createDirectoryIfMissing)
+import System.Directory (createDirectoryIfMissing, doesDirectoryExist) 
 import Data.Time
 import Data.ByteString.Lazy.UTF8 as BLU
 
@@ -81,9 +81,6 @@ wrap f = do
                 Left e -> (gen, throwM e)
                 Right (x, gen') -> (gen', return x)
 
-uploadDirectory :: FilePath
-uploadDirectory = "temp"
-
 postHomeR :: Handler Html
 postHomeR = do
     master <- getYesod
@@ -136,30 +133,42 @@ todToUTCTime :: TimeOfDay -> Day -> UTCTime
 todToUTCTime tod day = UTCTime day (timeOfDayToTime tod)
 
 
-getDownloadR :: Handler Html
-getDownloadR = do
-    (formWidget, formEnctype) <- generateFormPost sampleForm
-    let submission = Nothing :: Maybe FileForm
-        handlerName = "getHomeR" :: Text
-    defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "downloadpage")
+getDownloadR :: String -> Handler Html
+getDownloadR nonce = do
+    master <- getYesod
+    directoryExists <- liftIO $ doesDirectoryExist ((Data.Text.unpack $ (appFileUploadDirectory $ appSettings master)) ++ "/" ++ nonce)
+    if directoryExists 
+        then 
+           do 
+                (formWidget, formEnctype) <- generateFormPost sampleForm
+                let submission = Nothing :: Maybe FileForm
+                    handlerName = "getHomeR" :: Text
+                defaultLayout $ do
+                    let (commentFormId, commentTextareaId, commentListId) = commentIds
+                    aDomId <- newIdent
+                    setTitle "Welcome To Yesod!"
+                    $(widgetFile "downloadpage")
+     
+    else 
+        do
+                defaultLayout $ do
+                    let (commentFormId, commentTextareaId, commentListId) = commentIds
+                    aDomId <- newIdent
+                    setTitle "Welcome To Yesod!"
+                    $(widgetFile "errorpage")
 
-postDownloadR :: Handler Html
-postDownloadR = do
-    ((result, formWidget), formEnctype) <- runFormPost sampleForm
-    let handlerName = "postHomeR" :: Text
-        submission = case result of
-            FormSuccess res -> Just res
-            _ -> Nothing
 
-    defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "downloadpage")
+    
+
+    -- (formWidget, formEnctype) <- generateFormPost sampleForm
+    -- let submission = Nothing :: Maybe FileForm
+    --     handlerName = "getHomeR" :: Text
+    -- defaultLayout $ do
+    --     let (commentFormId, commentTextareaId, commentListId) = commentIds
+    --     aDomId <- newIdent
+    --     setTitle "Welcome To Yesod!"
+    --     $(widgetFile "downloadpage")
+
 
 sampleForm :: Form FileForm
 sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
