@@ -8,7 +8,7 @@
 
 / HomeR GET POST
 
-/download DownloadR GET POST
+/download/#String DownloadR GET 
 
 
 /files StaticUploadFilesR Static appUploadStatic
