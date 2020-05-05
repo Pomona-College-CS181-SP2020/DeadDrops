@@ -26,6 +26,12 @@ import Data.Time
 import Data.ByteString.Lazy.UTF8 as BLU (toString)
 import Data.List ((!!))
 import Data.Char (chr)
+import Data.Time.Zones.All
+import Data.Time.Zones
+import Data.Map
+import Data.Time.Format
+import Data.Time.Clock
+
 
 -- Define our data that will be used for creating the form.
 data FileForm = FileForm
@@ -34,6 +40,7 @@ data FileForm = FileForm
     , downloadFromTime :: TimeOfDay
     , downloadTo :: Day
     , downloadEndTime :: TimeOfDay
+    , timeZone :: TZLabel
     , fileDescription :: Text
     }
 
@@ -56,10 +63,37 @@ getHomeR = do
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
-getRetrieveR :: String -> String -> Handler ()
+getRetrieveR :: String -> String -> Handler Html
 getRetrieveR nonce filename = do
   master <- getYesod
-  sendFile "text/html" ((Data.Text.unpack (appFileUploadDirectory $ appSettings master)) ++ "/" ++ nonce ++ "/data/"++ filename)
+  directoryExists <- liftIO $ doesDirectoryExist ((Data.Text.unpack $ (appFileUploadDirectory $ appSettings master)) ++ "/" ++ nonce)
+  if directoryExists
+    then do
+      fileContents <- liftIO $ readFile ("/var/yesod-upload/" ++ nonce ++ "/meta.meta")
+      let arr = (Import.lines (bsToStr fileContents))
+          startTime = understandTime (arr!!2) :: UTCTime
+          endTime = understandTime (arr!!3) :: UTCTime
+          contentType = Import.fromString (arr!!1) :: ContentType
+      currTime <- liftIO getCurrentTime
+      if (currTime <= endTime) && (currTime >= startTime)
+        then do
+          sendFile contentType ((Data.Text.unpack (appFileUploadDirectory $ appSettings master)) ++ "/" ++ nonce ++ "/data/"++ filename)
+        else do
+          defaultLayout $ do
+              setTitle "Welcome To Yesod!"
+              $(widgetFile "errorpage")
+    else do
+      defaultLayout $ do
+          setTitle "Welcome To Yesod!"
+          $(widgetFile "errorpage")
+
+
+
+
+timeFormat = "%F %T UTC"
+understandTime = parseTimeOrError True defaultTimeLocale timeFormat
+
+
 
 instance MonadError GenError Handler where
             throwError = throwM
@@ -78,6 +112,11 @@ instance MonadCRandom GenError Handler where
                         Left e -> (gen, throwM e)
                         Right gen' -> (gen', return ())
             {-# INLINE doReseed #-}
+
+
+instance RenderMessage App String where
+    renderMessage _ _ s = Import.pack s
+
 
 wrap :: (SystemRandom -> Either GenError (a, SystemRandom)) -> Handler a
 wrap f = do
@@ -123,23 +162,30 @@ makeMetadataFile fileForm filePath = do
         endTime = downloadEndTime fileForm
         startDate = downloadFrom fileForm
         endDate = downloadTo fileForm
+        localStart = LocalTime startDate startTime
+        localEnd = LocalTime endDate endTime
+        utctimeStart = localTimeToUTCTZ (tzByLabel $ timeZone fileForm) localStart
+        utctimeEnd = localTimeToUTCTZ (tzByLabel $ timeZone fileForm) localEnd
         filename = Import.unpack $ fileName (fileInfo fileForm)
         dest' = filePath </> "meta.meta"
-        utctimeStart = todToUTCTime startTime startDate
-        utctimeEnd = todToUTCTime endTime endDate
         fileStartDate = (show utctimeStart) ++ "\n"
-        fileEndDate = (show utctimeEnd) ++ "\n"
+        fileEndDate = (show utctimeEnd)
+        contentType = Import.unpack $ fileContentType (fileInfo fileForm)
     currTime <- liftIO getCurrentTimeZone
     -- utcStart <- localToUTCTimeOfDay (currTime) startTime
     -- utcEnd <- localToUTCTimeOfDay currTime endTime
-    liftIO $ writeFile dest' ((Import.fromString filename ++ "\n") ++ (Import.fromString fileStartDate) ++ (Import.fromString fileEndDate))
+    liftIO $ writeFile dest' ((Import.fromString filename ++ "\n") ++
+                              (Import.fromString contentType ++ "\n") ++
+                              (Import.fromString fileStartDate) ++
+                              (Import.fromString fileEndDate)
+                              )
     return filename
 
 todToUTCTime :: TimeOfDay -> Day -> UTCTime
 todToUTCTime tod day = UTCTime day (timeOfDayToTime tod)
 
 bsToStr :: ByteString -> String
-bsToStr = map (chr . fromEnum) . Import.unpack
+bsToStr = Import.map (chr . fromEnum) . Import.unpack
 
 getDownloadR :: String -> Handler Html
 getDownloadR nonce = do
@@ -197,6 +243,7 @@ sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
         , jdsYearRange = "2020:+20" -- 2020 till 20 years from now
        }) "Download Window End Date " Nothing
     <*> areq timeFieldTypeTime endTimeSettings Nothing
+    <*> areq (selectField $ optionsPairs second_step) "Select Time Zone: " Nothing
     <*> areq textField textSettings Nothing
     -- Add attributes like the placeholder and CSS classes.
     where textSettings = FieldSettings
@@ -229,6 +276,8 @@ sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
                 , ("current time", "This is a test!")
                 ]
             }
+          maybeWorkable = Data.Map.toList tzNameLabelMap
+          second_step = Import.map (\(x,y) -> (bsToStr x, y)) maybeWorkable
 
 commentIds :: (Text, Text, Text)
 commentIds = ("js-commentForm", "js-createCommentTextarea", "js-commentList")
