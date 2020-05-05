@@ -20,6 +20,4 @@ spec = withApp $ do
               fileByLabelContain "a file" "test/Spec.hs" "text/plain" -- talk about self-reference
               byLabelExact "Upload a file" "localhost"
 
-          -- more debugging printBody
-          htmlAllContain "upload-response" "text/plain"
-          htmlAllContain "upload-response" "available"
+          
