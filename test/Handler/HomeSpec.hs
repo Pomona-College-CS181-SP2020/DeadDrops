@@ -18,7 +18,7 @@ spec = withApp $ do
               setUrl HomeR
               addToken
               fileByLabelContain "a file" "test/Spec.hs" "text/plain" -- talk about self-reference
-              byLabelExact "Your file" "localhost"
+              byLabelExact "Upload a file" "localhost"
 
           -- more debugging printBody
           htmlAllContain ".upload-response" "text/plain"
