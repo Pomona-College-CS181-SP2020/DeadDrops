@@ -1,0 +1,23 @@
+1) Using random bytestring function in Handler monad
+--> fixed by using liftIO function to lift from IO to Handler
+
+2) Can't restrict timing when statically serving uploaded files
+--> fixed by using a get request and a handler to manage download requests
+
+3) using /var/yesod-uploads breaks the travis build
+--> fixed: include sudo mkdir /var/yesod-upload and sudo chmod 0777 /var/yesod-upload in the travis yaml
+
+4) dealing with type conversions between bytestring and string and text
+--> always annoying but can use Data.Text.unpack, Import.unpack, something.toString to work with types
+
+5) converting download window to user time zone on the download landing page for display
+--> need to do this still i think
+
+6) Retrieving time zones -- lots of type errors trying to call optionsPairs using the TZ label list package
+--resolved - issues with Data.Map.map versus Data.lsit.map
+
+7) time zone retrieval -- how do we pass a client javascript value to be used in haskell on the server
+--> resolved by using a post request and new handler
+
+8) possible bug for new time zone retrieval script -- writing to file is subject to concurrent user issues
+--resolved -> we're doing something else
