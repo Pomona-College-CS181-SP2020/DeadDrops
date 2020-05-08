@@ -54,6 +54,7 @@ data FileForm = FileForm
 getHomeR :: Handler Html
 getHomeR = do
     (formWidget, formEnctype) <- generateFormPost sampleForm
+    $logInfo "Let a girl log"
     let submission = Nothing :: Maybe FileForm
         handlerName = "getHomeR" :: Text
         nonce = undefined
@@ -77,12 +78,14 @@ getRetrieveR nonce filename = do
       currTime <- liftIO getCurrentTime
       if (currTime <= endTime) && (currTime >= startTime)
         then do
+          $logInfo "File successfully accessed"
           sendFile contentType ((Data.Text.unpack (appFileUploadDirectory $ appSettings master)) ++ "/" ++ nonce ++ "/data/"++ filename)
         else do
           defaultLayout $ do
               setTitle "Welcome To Yesod!"
               $(widgetFile "errorpage")
     else do
+      $logInfo "Invalid nonce for download attempt"
       defaultLayout $ do
           setTitle "Welcome To Yesod!"
           $(widgetFile "errorpage")
@@ -141,6 +144,7 @@ postHomeR = do
             let prefix = (Data.Text.unpack $ (appFileUploadDirectory $ appSettings master) ++ "/" ++ (Data.Text.Encoding.decodeUtf8 $ encode randomBS))
             saveMeas (fileInfo fileForm)  (prefix ++ "/data")
             makeMetadataFile fileForm prefix
+            $logInfo "File uploadedf"
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
             nonce = randomBS
@@ -193,6 +197,7 @@ getDownloadR nonce = do
     directoryExists <- liftIO $ doesDirectoryExist ((Data.Text.unpack $ (appFileUploadDirectory $ appSettings master)) ++ "/" ++ nonce)
     if directoryExists
         then do
+            $logInfo "Download landing page accessed"
             fileContents <- liftIO $ readFile ("/var/yesod-upload/" ++ nonce ++ "/meta.meta")
             let arr = (Import.lines (bsToStr fileContents))
                 fileName =  (arr!!0)
@@ -205,17 +210,18 @@ getDownloadR nonce = do
                         handlerName = "getHomeR" :: Text
                         downloadUrl = "/files/" ++ nonce ++"/data/" ++ fileName :: String
                     defaultLayout $ do
-                        setTitle "Welcome To Yesod!"
+                        setTitle "Ready to Download!"
                         $(widgetFile "downloadpage")
                 else do
                     defaultLayout $ do
-                        setTitle "Welcome To Yesod!"
-                        $(widgetFile "errorpage")
+                        setTitle "Come Back Soon!"
+                        $(widgetFile "downloadlater")
         else do
+            $logInfo "Invalid nonce for download landing page"
             defaultLayout $ do
                 let (commentFormId, commentTextareaId, commentListId) = commentIds
                 aDomId <- newIdent
-                setTitle "Welcome To Yesod!"
+                setTitle "Invalid URL"
                 $(widgetFile "errorpage")
 
 

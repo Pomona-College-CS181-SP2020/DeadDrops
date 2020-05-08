@@ -4,9 +4,9 @@
             <h1 .header>
                 Welcome to Dead Drops!
             <h2>
-                Where You Can Drop Dead
-            <a href="https://www.instagram.com/ceceliasanborn/" .btn.btn-info.btn-lg>
-                Follow Me on Instagram
+                Scroll Down To Upload a File
+            <a href="https://github.com/Pomona-College-CS181-SP2020/DeadDrops" .btn.btn-info.btn-lg>
+                Check Out Our Github Here
 
 <div .container>
     <!-- Starting
@@ -27,7 +27,7 @@
                     <h1 #forms>Upload Files
 
                     <p>
-                        sick
+                        Here, you can choose the file you want to upload, and the start and end dates/times for the file upload. Once uploaded, your secure download URL will appear. Only distribute this URL to those who you want to give access to!
 
         <div .row>
             <div .col-lg-6>

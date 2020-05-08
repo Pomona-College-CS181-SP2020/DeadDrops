@@ -2,7 +2,6 @@
     <div .container>
         <div .row>
             <h1 .header>
-                Your File is not available! Uh OH!
+                There is no file available here!
             <h2>
-                Try Again Next Time, Bucko
-          
+                Invalid URL
