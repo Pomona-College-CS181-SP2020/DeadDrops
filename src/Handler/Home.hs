@@ -54,14 +54,14 @@ data FileForm = FileForm
 getHomeR :: Handler Html
 getHomeR = do
     (formWidget, formEnctype) <- generateFormPost sampleForm
-    $logInfo "Let a girl log"
+    $logDebug "Your logging works"
     let submission = Nothing :: Maybe FileForm
         handlerName = "getHomeR" :: Text
         nonce = undefined
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
         aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
+        setTitle "Dead Drops"
         $(widgetFile "homepage")
 
 getRetrieveR :: String -> String -> Handler Html
@@ -82,12 +82,12 @@ getRetrieveR nonce filename = do
           sendFile contentType ((Data.Text.unpack (appFileUploadDirectory $ appSettings master)) ++ "/" ++ nonce ++ "/data/"++ filename)
         else do
           defaultLayout $ do
-              setTitle "Welcome To Yesod!"
+              setTitle "You downloaded a file!"
               $(widgetFile "errorpage")
     else do
       $logInfo "Invalid nonce for download attempt"
       defaultLayout $ do
-          setTitle "Welcome To Yesod!"
+          setTitle "Invalid URL"
           $(widgetFile "errorpage")
 
 
@@ -170,10 +170,11 @@ makeMetadataFile fileForm filePath = do
         localEnd = LocalTime endDate endTime
         utctimeStart = localTimeToUTCTZ (tzByLabel $ timeZone fileForm) localStart
         utctimeEnd = localTimeToUTCTZ (tzByLabel $ timeZone fileForm) localEnd
+        timezone = (timeZone fileForm)
         filename = Import.unpack $ fileName (fileInfo fileForm)
         dest' = filePath </> "meta.meta"
         fileStartDate = (show utctimeStart) ++ "\n"
-        fileEndDate = (show utctimeEnd)
+        fileEndDate = (show utctimeEnd) ++ "\n"
         contentType = Import.unpack $ fileContentType (fileInfo fileForm)
     currTime <- liftIO getCurrentTimeZone
     -- utcStart <- localToUTCTimeOfDay (currTime) startTime
@@ -181,7 +182,8 @@ makeMetadataFile fileForm filePath = do
     liftIO $ writeFile dest' ((Import.fromString filename ++ "\n") ++
                               (Import.fromString contentType ++ "\n") ++
                               (Import.fromString fileStartDate) ++
-                              (Import.fromString fileEndDate)
+                              (Import.fromString fileEndDate) ++
+                              (Import.fromString (show timezone))
                               )
     return filename
 
@@ -203,6 +205,11 @@ getDownloadR nonce = do
                 fileName =  (arr!!0)
                 startTime = understandTime (arr!!2) :: UTCTime
                 endTime = understandTime (arr!!3) :: UTCTime
+                tz = tzByName (Import.fromString (arr!!4))
+                (localStart, localEnd) = case tz of
+                  Just x -> (show (utcToLocalTimeTZ x startTime), show $ utcToLocalTimeTZ x endTime)
+                  Nothing -> (show (startTime), show (endTime))
+                --localEnd = utcToLocalTimeTZ tz endTime
             currTime <- liftIO getCurrentTime
             if (currTime <= endTime) && (currTime >= startTime)
                 then do

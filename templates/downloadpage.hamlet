@@ -4,6 +4,6 @@
             <h1 .header>
                  Ready to Roll!
             <h2>
-                Your file will be available from #{show startTime} to #{show endTime}.
+                Your file will be available from #{localStart} to #{localEnd}.
             <a href=#{downloadUrl} .btn.btn-info.btn-lg>
                 Download!
